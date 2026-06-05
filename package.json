@@ -1,0 +1,8 @@
+{
+  "name": "encatch-docusaurus-examples",
+  "private": true,
+  "scripts": {
+    "dev:docusaurus": "pnpm --filter docusaurus preview",
+    "build:docusaurus": "pnpm --filter docusaurus build"
+  }
+}

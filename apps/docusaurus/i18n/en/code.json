@@ -1,0 +1,17 @@
+{
+  "docsFeedback.helpfulQuestion": {
+    "message": "Was this page helpful?"
+  },
+  "docsFeedback.yes": {
+    "message": "Yes"
+  },
+  "docsFeedback.no": {
+    "message": "No"
+  },
+  "docsFeedback.suggestEdits": {
+    "message": "Suggest edits"
+  },
+  "docsFeedback.raiseIssue": {
+    "message": "Raise issue"
+  }
+}
