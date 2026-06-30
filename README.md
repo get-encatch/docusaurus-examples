@@ -8,7 +8,7 @@ Sample Docusaurus docs site with Encatch page feedback in the footer.
 pnpm install
 ```
 
-Copy `.env.example` → `.env` in the app and set your Encatch publishable key and form slugs (see that app’s README for variable names).
+Copy `.env.example` → `.env` in the app and set your Encatch publishable key and combined form slug / question slugs (see that app’s README for variable names).
 
 **Publishable key:** [admin.encatch.com](https://admin.encatch.com) → **Settings** → **Publishable key**.
 
@@ -26,7 +26,7 @@ Spanish docs: http://localhost:3000/es/docs
 
 The app uses the same pattern as the Fumadocs examples:
 
-1. **`.env`** — publishable key + form slugs (from `.env.example`).
+1. **`.env`** — publishable key + combined form slug and question slugs (from `.env.example`).
 2. **`src/lib/encatch.tsx`** — SDK init, env, and form helpers.
 3. **`src/components/DocsPageFeedback.tsx`** — footer UI.
 4. **`src/theme/Root.tsx`** — `<EncatchInit locale={...} />`.

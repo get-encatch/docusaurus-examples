@@ -29,21 +29,17 @@ const config: Config = {
   customFields: {
     encatch: {
       publishableKey: process.env.ENCATCH_SDK_PUBLISHABLE_KEY ?? '',
-      helpfulFormSlug:
-        process.env.ENCATCH_HELPFUL_FORM_SLUG ?? 'helpful_documentation_choice',
-      helpfulPageUrlQuestionSlug:
-        process.env.ENCATCH_HELPFUL_PAGE_URL_QUESTION_SLUG ?? 'page_url',
+      formSlug:
+        process.env.ENCATCH_DOCUMENTATION_FEEDBACK_FORM_SLUG ??
+        'documentation_feedback',
+      feedbackTypeQuestionSlug:
+        process.env.ENCATCH_FEEDBACK_TYPE_QUESTION_SLUG ??
+        'documentation_feedback_type',
+      pageUrlQuestionSlug:
+        process.env.ENCATCH_PAGE_URL_QUESTION_SLUG ?? 'page_url',
       helpfulChoiceQuestionSlug:
         process.env.ENCATCH_HELPFUL_CHOICE_QUESTION_SLUG ??
         'helpful_question_choice',
-      suggestEditFormSlug:
-        process.env.ENCATCH_SUGGEST_AN_EDIT_FORM_SLUG ?? 'encatch_suggest_an_edit',
-      suggestEditQuestionSlug:
-        process.env.ENCATCH_SUGGEST_AN_EDIT_QUESTION_SLUG ?? 'documentation_url',
-      raiseIssueFormSlug:
-        process.env.ENCATCH_RAISE_ISSUE_FORM_SLUG ?? 'encatch_raise_issue',
-      raiseIssueQuestionSlug:
-        process.env.ENCATCH_RAISE_ISSUE_QUESTION_SLUG ?? 'page_url',
     },
   },
 

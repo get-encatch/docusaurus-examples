@@ -9,6 +9,8 @@ Good documentation depends on knowing which pages help and which ones confuse re
 
 Each docs page in this repo includes a footer with:
 
-- **Was this page helpful?** — Yes / No opens an Encatch form with the page URL and your choice (`yes` / `no`) prefilled (configure via `ENCATCH_HELPFUL_*` in `.env.example`, exposed through `customFields` in `docusaurus.config.ts`).
-- **Suggest edits** — Opens an Encatch form with the current page URL prefilled (configure via `ENCATCH_*` env vars in `.env.example`).
-- **Raise issue** — Opens an Encatch form with the current page URL prefilled (configure via `ENCATCH_*` env vars in `.env.example`).
+- **Was this page helpful?** — Yes / No opens the combined Encatch feedback form with routing (`page-helpful`), the page URL, and your choice (`yes` / `no`) prefilled.
+- **Suggest edits** — Opens the same form with routing (`suggest-edit`) and the current page URL prefilled.
+- **Raise issue** — Opens the same form with routing (`raise-issue`) and the current page URL prefilled.
+
+Configure the form slug and question slugs via `ENCATCH_*` in `.env.example` (exposed through `customFields` in `docusaurus.config.ts`).
