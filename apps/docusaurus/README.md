@@ -8,7 +8,7 @@ Copy `.env.example` → `.env` and set `ENCATCH_*` values (publishable key + com
 
 ## Run
 
-From repo root (recommended — locale switcher works):
+From repo root:
 
 ```bash
 pnpm dev:docusaurus
@@ -17,18 +17,10 @@ pnpm dev:docusaurus
 From this folder:
 
 ```bash
-pnpm preview
-```
-
-Open http://localhost:3000/docs. Spanish: http://localhost:3000/es/docs (use the locale dropdown or this URL).
-
-For English-only hot reload during development:
-
-```bash
 pnpm start
 ```
 
-Docusaurus serves one locale at a time in dev mode, so the locale dropdown 404s under `pnpm start`. Use `pnpm preview` (or `pnpm start:es` for Spanish-only dev) to test translations.
+Open http://localhost:3000/docs.
 
 ## Encatch — what to refer to
 

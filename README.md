@@ -32,9 +32,7 @@ pnpm install
 |-----|---------|------|
 | Docusaurus | `pnpm dev:docusaurus` | http://localhost:3000/docs |
 
-From the app folder: `pnpm preview` (locale switcher works). Use `pnpm start` for English-only hot reload.
-
-Spanish docs: http://localhost:3000/es/docs
+From the app folder: `pnpm start`.
 
 ## Encatch integration
 

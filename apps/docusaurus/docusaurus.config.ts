@@ -19,10 +19,9 @@ const config: Config = {
 
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'es'],
+    locales: ['en'],
     localeConfigs: {
       en: {label: 'English'},
-      es: {label: 'Español'},
     },
   },
 
@@ -71,10 +70,6 @@ const config: Config = {
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Docs',
-        },
-        {
-          type: 'localeDropdown',
-          position: 'right',
         },
         {
           href: 'https://github.com/get-encatch/docusaurus-examples',
