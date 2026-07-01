@@ -11,14 +11,15 @@ import type {Theme} from '@encatch/web-sdk';
 
 export type EncatchConfig = {
   publishableKey: string;
-  helpfulFormSlug: string;
-  helpfulPageUrlQuestionSlug: string;
+  formSlug: string;
+  feedbackTypeQuestionSlug: string;
+  pageUrlQuestionSlug: string;
   helpfulChoiceQuestionSlug: string;
-  suggestEditFormSlug: string;
-  suggestEditQuestionSlug: string;
-  raiseIssueFormSlug: string;
-  raiseIssueQuestionSlug: string;
+  apiHost?: string;
+  webHost?: string;
 };
+
+type DocumentationFeedbackRoute = 'page-helpful' | 'suggest-edit' | 'raise-issue';
 
 let encatchConfig: EncatchConfig | null = null;
 
@@ -28,6 +29,40 @@ export function setEncatchConfig(config: EncatchConfig): void {
 
 function getEncatchConfig(): EncatchConfig | null {
   return encatchConfig;
+}
+
+function trimEnv(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed || undefined;
+}
+
+function toEncatchHostUrl(value: string | undefined): string | undefined {
+  const trimmed = trimEnv(value);
+  if (!trimmed) {
+    return undefined;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
+function buildEncatchInitConfig(
+  config: EncatchConfig,
+  options?: {theme?: Theme},
+): import('@encatch/web-sdk').EncatchConfig {
+  const initConfig: import('@encatch/web-sdk').EncatchConfig = {
+    theme: options?.theme ?? 'system',
+  };
+  const webHost = toEncatchHostUrl(config.webHost);
+  const apiHost = toEncatchHostUrl(config.apiHost);
+  if (webHost) {
+    initConfig.webHost = webHost;
+  }
+  if (apiHost) {
+    initConfig.apiBaseUrl = apiHost;
+  }
+  return initConfig;
 }
 
 /** Ensure `_encatch.init` has run before `showForm` / other SDK calls. */
@@ -44,7 +79,7 @@ export function ensureEncatchInitialized(options?: {theme?: Theme}): boolean {
   if (!_encatch._initialized) {
     try {
       const theme: Theme = options?.theme ?? 'system';
-      _encatch.init(apiKey, {theme});
+      _encatch.init(apiKey, buildEncatchInitConfig(config, options));
     } catch (error) {
       console.error('Encatch init failed:', error);
       return false;
@@ -88,92 +123,75 @@ function toAbsolutePageUrl(pageUrl: string): string {
     : pageUrl;
 }
 
+function openDocumentationFeedbackForm(
+  pageUrl: string,
+  route: DocumentationFeedbackRoute,
+  locale?: string,
+  helpfulVote?: 'yes' | 'no',
+) {
+  const config = getEncatchConfig();
+  const formSlug = config?.formSlug?.trim();
+  const feedbackTypeQuestionSlug = config?.feedbackTypeQuestionSlug?.trim();
+  const pageUrlQuestionSlug = config?.pageUrlQuestionSlug?.trim();
+  const helpfulChoiceQuestionSlug = config?.helpfulChoiceQuestionSlug?.trim();
+
+  if (!formSlug) {
+    console.warn(
+      'ENCATCH_DOCUMENTATION_FEEDBACK_FORM_SLUG is not set or is empty',
+    );
+    return;
+  }
+  if (!feedbackTypeQuestionSlug) {
+    console.warn(
+      'ENCATCH_FEEDBACK_TYPE_QUESTION_SLUG is not set or is empty',
+    );
+    return;
+  }
+  if (!pageUrlQuestionSlug) {
+    console.warn('ENCATCH_PAGE_URL_QUESTION_SLUG is not set or is empty');
+    return;
+  }
+  if (route === 'page-helpful') {
+    if (!helpfulChoiceQuestionSlug) {
+      console.warn(
+        'ENCATCH_HELPFUL_CHOICE_QUESTION_SLUG is not set or is empty',
+      );
+      return;
+    }
+    if (!helpfulVote) {
+      console.warn('Helpful feedback requires a yes/no vote');
+      return;
+    }
+  }
+  if (!ensureEncatchInitialized()) {
+    return;
+  }
+  if (locale) {
+    syncEncatchLocale(locale);
+  }
+
+  _encatch.addToResponse(feedbackTypeQuestionSlug, route);
+  _encatch.addToResponse(pageUrlQuestionSlug, toAbsolutePageUrl(pageUrl));
+  if (route === 'page-helpful' && helpfulVote) {
+    _encatch.addToResponse(helpfulChoiceQuestionSlug, helpfulVote);
+  }
+  _encatch.showForm(formSlug);
+}
+
 export function openHelpfulFeedbackForm(
   pageUrl: string,
   vote: 'yes' | 'no',
   locale?: string,
 ) {
-  const config = getEncatchConfig();
-  const formSlug = config?.helpfulFormSlug?.trim();
-  const pageUrlQuestionSlug = config?.helpfulPageUrlQuestionSlug?.trim();
-  const choiceQuestionSlug = config?.helpfulChoiceQuestionSlug?.trim();
-
-  if (!formSlug) {
-    console.warn('ENCATCH_HELPFUL_FORM_SLUG is not set or is empty');
-    return;
-  }
-  if (!pageUrlQuestionSlug) {
-    console.warn(
-      'ENCATCH_HELPFUL_PAGE_URL_QUESTION_SLUG is not set or is empty',
-    );
-    return;
-  }
-  if (!choiceQuestionSlug) {
-    console.warn(
-      'ENCATCH_HELPFUL_CHOICE_QUESTION_SLUG is not set or is empty',
-    );
-    return;
-  }
-  if (!ensureEncatchInitialized()) {
-    return;
-  }
-  if (locale) {
-    syncEncatchLocale(locale);
-  }
-
-  _encatch.addToResponse(pageUrlQuestionSlug, toAbsolutePageUrl(pageUrl));
-  _encatch.addToResponse(choiceQuestionSlug, vote);
-  _encatch.showForm(formSlug);
+  openDocumentationFeedbackForm(pageUrl, 'page-helpful', locale, vote);
 }
 
 export function openSuggestEditForm(pageUrl: string, locale?: string) {
-  const config = getEncatchConfig();
-  const formSlug = config?.suggestEditFormSlug?.trim();
-  const questionSlug = config?.suggestEditQuestionSlug?.trim();
-
-  if (!formSlug) {
-    console.warn('ENCATCH_SUGGEST_AN_EDIT_FORM_SLUG is not set or is empty');
-    return;
-  }
-  if (!questionSlug) {
-    console.warn(
-      'ENCATCH_SUGGEST_AN_EDIT_QUESTION_SLUG is not set or is empty',
-    );
-    return;
-  }
-  if (!ensureEncatchInitialized()) {
-    return;
-  }
-  if (locale) {
-    syncEncatchLocale(locale);
-  }
-
-  _encatch.addToResponse(questionSlug, toAbsolutePageUrl(pageUrl));
-  _encatch.showForm(formSlug);
+  openDocumentationFeedbackForm(pageUrl, 'suggest-edit', locale);
 }
 
 export function openRaiseIssueForm(pageUrl: string, locale?: string) {
-  const config = getEncatchConfig();
-  const formSlug = config?.raiseIssueFormSlug?.trim();
-  const questionSlug = config?.raiseIssueQuestionSlug?.trim();
-
-  if (!formSlug) {
-    console.warn('ENCATCH_RAISE_ISSUE_FORM_SLUG is not set or is empty');
-    return;
-  }
-  if (!questionSlug) {
-    console.warn('ENCATCH_RAISE_ISSUE_QUESTION_SLUG is not set or is empty');
-    return;
-  }
-  if (!ensureEncatchInitialized()) {
-    return;
-  }
-  if (locale) {
-    syncEncatchLocale(locale);
-  }
-
-  _encatch.addToResponse(questionSlug, toAbsolutePageUrl(pageUrl));
-  _encatch.showForm(formSlug);
+  openDocumentationFeedbackForm(pageUrl, 'raise-issue', locale);
 }
 
 export function EncatchInit({
