@@ -3,6 +3,11 @@
   "private": true,
   "scripts": {
     "dev:docusaurus": "pnpm --filter docusaurus preview",
-    "build:docusaurus": "pnpm --filter docusaurus build"
+    "build:docusaurus": "pnpm --filter docusaurus build",
+    "test:visual": "playwright test",
+    "test:visual:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
   }
 }

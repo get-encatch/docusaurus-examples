@@ -15,6 +15,8 @@ export type EncatchConfig = {
   feedbackTypeQuestionSlug: string;
   pageUrlQuestionSlug: string;
   helpfulChoiceQuestionSlug: string;
+  apiHost?: string;
+  webHost?: string;
 };
 
 type DocumentationFeedbackRoute = 'page-helpful' | 'suggest-edit' | 'raise-issue';
@@ -27,6 +29,40 @@ export function setEncatchConfig(config: EncatchConfig): void {
 
 function getEncatchConfig(): EncatchConfig | null {
   return encatchConfig;
+}
+
+function trimEnv(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed || undefined;
+}
+
+function toEncatchHostUrl(value: string | undefined): string | undefined {
+  const trimmed = trimEnv(value);
+  if (!trimmed) {
+    return undefined;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
+function buildEncatchInitConfig(
+  config: EncatchConfig,
+  options?: {theme?: Theme},
+): import('@encatch/web-sdk').EncatchConfig {
+  const initConfig: import('@encatch/web-sdk').EncatchConfig = {
+    theme: options?.theme ?? 'system',
+  };
+  const webHost = toEncatchHostUrl(config.webHost);
+  const apiHost = toEncatchHostUrl(config.apiHost);
+  if (webHost) {
+    initConfig.webHost = webHost;
+  }
+  if (apiHost) {
+    initConfig.apiBaseUrl = apiHost;
+  }
+  return initConfig;
 }
 
 /** Ensure `_encatch.init` has run before `showForm` / other SDK calls. */
@@ -43,7 +79,7 @@ export function ensureEncatchInitialized(options?: {theme?: Theme}): boolean {
   if (!_encatch._initialized) {
     try {
       const theme: Theme = options?.theme ?? 'system';
-      _encatch.init(apiKey, {theme});
+      _encatch.init(apiKey, buildEncatchInitConfig(config, options));
     } catch (error) {
       console.error('Encatch init failed:', error);
       return false;

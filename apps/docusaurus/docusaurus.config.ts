@@ -39,6 +39,8 @@ const config: Config = {
       helpfulChoiceQuestionSlug:
         process.env.ENCATCH_HELPFUL_CHOICE_QUESTION_SLUG ??
         'helpful_question_choice',
+      apiHost: process.env.ENCATCH_API_HOST ?? '',
+      webHost: process.env.ENCATCH_WEB_HOST ?? '',
     },
   },
 
